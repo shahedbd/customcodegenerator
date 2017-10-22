@@ -11,7 +11,7 @@ namespace CodeGenerator
             SqlConnection sqlConn = null;
             try
             {
-                sqlConn = new SqlConnection(ConfigurationManager.ConnectionStrings["CMSYPLocal"].ConnectionString);
+                sqlConn = new SqlConnection(ConfigurationManager.ConnectionStrings["DBConn"].ConnectionString);
             }
             catch (Exception ex)
             {

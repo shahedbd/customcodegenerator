@@ -70,8 +70,8 @@ namespace CodeGenerator
 
             foreach (var schema in tableSchema)
             {
-                //writer.WriteLine("@" + schema.ColumnName + "		" + schema.DbTypeName + "=null,");
-                writer.WriteLine("@" + schema.ColumnName + "		" + schema.DbTypeName + (schema.DbTypeName == "nvarchar" ? "(" + schema.ColumnSize.ToString() + ")" : "") + " = null,");
+                writer.WriteLine("@" + schema.ColumnName + "		" + schema.DbTypeName + (schema.DbTypeName == "nchar" ? "(" + schema.ColumnSize.ToString() + ")" : "") + " = null,");
+                var abc = "@" + schema.ColumnName + "		" + schema.DbTypeName + (schema.DbTypeName == "nchar" ? "(" + schema.ColumnSize.ToString() + ")" : "") + " = null,";
             }
 
             writer.WriteLine("");
