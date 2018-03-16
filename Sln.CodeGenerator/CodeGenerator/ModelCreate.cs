@@ -42,10 +42,10 @@ namespace CodeGenerator
                 {
                     if ("ntext".Equals(schema.DbTypeName))
                     {
-                        writer.WriteLine("      public string " + schema.ColumnName + " { get; set; }");
+                        writer.WriteLine("        public string " + schema.ColumnName + " { get; set; }");
                         continue;
                     }
-                    writer.WriteLine("      public " + schema.DataTypeName + " " + schema.ColumnName + " { get; set; }");
+                    writer.WriteLine("        public " + schema.DataTypeName + " " + schema.ColumnName + " { get; set; }");
                 }
 
                 writer.WriteLine("    }");

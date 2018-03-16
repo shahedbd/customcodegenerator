@@ -40,12 +40,9 @@ namespace CodeGenerator
                 WriteSpHeader(writer);
 
                 WriteAddSql(writer);
-
                 Blank(writer);
 
                 WriteUpdateSql(writer);
-
-
                 Blank(writer);
 
                 WriteDeleteSql(writer);
@@ -54,6 +51,7 @@ namespace CodeGenerator
 
                 WriteGetAll(writer);
                 Blank(writer);
+
                 WriteGetByPk(writer);
             }
         }
@@ -82,58 +80,48 @@ namespace CodeGenerator
 
         }
 
-        private void WriteGetByPk(StreamWriter writer)
+        private void WriteAddSql(StreamWriter writer)
         {
-            writer.WriteLine("--Select " + tableName + " By " + tablePk.ColumnName + " ");
-            writer.WriteLine("if(@pOptions=" + (int)SqlType.SelectById + ")");
+            Blank(writer);
+            writer.WriteLine("--Save " + tableName + "");
+            writer.WriteLine("if(@pOptions=" + (int)SqlType.Add + ")");
             writer.WriteLine("begin");
-            writer.WriteLine("select * from " + tableName + " Where " + tablePk.ColumnName + "=@" + tablePk.ColumnName + ";");
-            Blank(writer);
+            writer.WriteLine("INSERT INTO " + tableName + "");
+            writer.WriteLine("(");
 
-            writer.WriteLine("if(@@ROWCOUNT=0)");
-            writer.WriteLine("SET @Msg='Data Not Found';");
+            var stringBuilder = new StringBuilder();
+
+            foreach (var schema in tableSchema)
+            {
+                stringBuilder.Append(schema.ColumnName + ",");
+            }
+
+            writer.WriteLine(stringBuilder.RemoveLast(","));
+
+            writer.WriteLine(")");
+            writer.WriteLine("VALUES( ");
+
+
+            stringBuilder = new StringBuilder();
+            foreach (var schema in tableSchema)
+            {
+                stringBuilder.Append("@" + schema.ColumnName + ",");
+            }
+            writer.WriteLine(stringBuilder.RemoveLast(","));
+
+            writer.WriteLine(")");
+
+            writer.WriteLine("IF @@ROWCOUNT = 0");
+            writer.WriteLine("Begin");
+            writer.WriteLine("SET @Msg='Warning: No rows were Inserted';	");
+            writer.WriteLine("End");
+            writer.WriteLine("Else");
+            writer.WriteLine("Begin");
+            writer.WriteLine("SET @Msg='Data Saved Successfully';	");
+            writer.WriteLine("End					");
             writer.WriteLine("end");
-            writer.WriteLine("--End of Select " + tableName + " By " + tablePk.ColumnName + " ");
+            writer.WriteLine("--End of Save " + tableName + "");
 
-        }
-
-        private void WriteGetAll(StreamWriter writer)
-        {
-            writer.WriteLine("--Select All " + tableName + " ");
-            Blank(writer);
-
-            writer.WriteLine("if(@pOptions=" + (int)SqlType.SelectAll + ")");
-            writer.WriteLine("begin	        ");
-            writer.WriteLine("select * from " + tableName + ";");
-            writer.WriteLine("if(@@ROWCOUNT=0)");
-            writer.WriteLine("SET @Msg='Data Not Found';");
-            writer.WriteLine("end");
-            Blank(writer);
-
-            writer.WriteLine("--End of Select All " + tableName + " ");
-
-        }
-
-        private void WriteDeleteSql(StreamWriter writer)
-        {
-            writer.WriteLine("--Delete " + tableName + "");
-            Blank(writer);
-            writer.WriteLine("if(@pOptions=" + (int)SqlType.Delete + ")");
-            writer.WriteLine("begin");
-            writer.WriteLine("Delete from " + tableName + " Where " + tablePk.ColumnName + "=@" + tablePk.ColumnName + ";");
-            writer.WriteLine("SET @Msg='Data Deleted Successfully';");
-            writer.WriteLine("end");
-            Blank(writer);
-            writer.WriteLine("--End of Delete " + tableName + " ");
-
-
-        }
-
-        private static void Blank(StreamWriter writer)
-        {
-            writer.WriteLine();
-            writer.WriteLine();
-            writer.WriteLine();
         }
 
         private void WriteUpdateSql(StreamWriter writer)
@@ -151,15 +139,8 @@ namespace CodeGenerator
                 stringBuilder.AppendLine("" + schema.ColumnName + "	=	@" + schema.ColumnName + " ,");
             }
             writer.WriteLine(stringBuilder.RemoveLast(","));
-
-            Blank(writer);
-
-
+        
             writer.WriteLine("WHERE	" + tablePk.ColumnName + "	=	@" + tablePk.ColumnName + ";");
-
-            Blank(writer);
-
-
 
             writer.WriteLine("IF @@ROWCOUNT = 0");
             writer.WriteLine("Begin");
@@ -173,47 +154,48 @@ namespace CodeGenerator
             writer.WriteLine("--End of Update " + tableName + " ");
         }
 
-        private void WriteAddSql(StreamWriter writer)
+        private void WriteDeleteSql(StreamWriter writer)
         {
-            writer.WriteLine("--Save " + tableName + "");
-            writer.WriteLine("if(@pOptions=" + (int)SqlType.Add + ")");
+            writer.WriteLine("--Delete " + tableName + "");
+            writer.WriteLine("if(@pOptions=" + (int)SqlType.Delete + ")");
             writer.WriteLine("begin");
-            writer.WriteLine("INSERT INTO " + tableName + "");
-            writer.WriteLine("(");
-
-            var stringBuilder = new StringBuilder();
-
-            foreach (var schema in tableSchema)
-            {
-                stringBuilder.AppendLine(schema.ColumnName + ",");
-            }
-
-            writer.WriteLine(stringBuilder.RemoveLast(","));
-
-            writer.WriteLine(")");
-            writer.WriteLine("VALUES");
-            writer.WriteLine("(	");
-
-
-            stringBuilder = new StringBuilder();
-            foreach (var schema in tableSchema)
-            {
-                stringBuilder.AppendLine("@" + schema.ColumnName + ",");
-            }
-            writer.WriteLine(stringBuilder.RemoveLast(","));
-
-            writer.WriteLine(")");
-            writer.WriteLine("IF @@ROWCOUNT = 0");
-            writer.WriteLine("Begin");
-            writer.WriteLine("SET @Msg='Warning: No rows were Inserted';	");
-            writer.WriteLine("End");
-            writer.WriteLine("Else");
-            writer.WriteLine("Begin");
-            writer.WriteLine("SET @Msg='Data Saved Successfully';	");
-            writer.WriteLine("End					");
+            writer.WriteLine("Delete from " + tableName + " Where " + tablePk.ColumnName + "=@" + tablePk.ColumnName + ";");
+            writer.WriteLine("SET @Msg='Data Deleted Successfully';");
             writer.WriteLine("end");
-            writer.WriteLine("--End of Save " + tableName + "");
+            writer.WriteLine("--End of Delete " + tableName + " ");
+        }
+      
+        private void WriteGetAll(StreamWriter writer)
+        {
+            writer.WriteLine("--Select All " + tableName + " ");
+            writer.WriteLine("if(@pOptions=" + (int)SqlType.SelectAll + ")");
+            writer.WriteLine("begin	        ");
+            writer.WriteLine("select * from " + tableName + ";");
+            writer.WriteLine("if(@@ROWCOUNT=0)");
+            writer.WriteLine("SET @Msg='Data Not Found';");
+            writer.WriteLine("end");
+            writer.WriteLine("--End of Select All " + tableName + " ");
+        }
 
+        private void WriteGetByPk(StreamWriter writer)
+        {
+            writer.WriteLine("--Select " + tableName + " By " + tablePk.ColumnName + " ");
+            writer.WriteLine("if(@pOptions=" + (int)SqlType.SelectById + ")");
+            writer.WriteLine("begin");
+            writer.WriteLine("select * from " + tableName + " Where " + tablePk.ColumnName + "=@" + tablePk.ColumnName + ";");          
+            writer.WriteLine("if(@@ROWCOUNT=0)");
+            writer.WriteLine("SET @Msg='Data Not Found';");
+            writer.WriteLine("end");
+            writer.WriteLine("--End of Select " + tableName + " By " + tablePk.ColumnName + " ");
+        }
+
+
+
+        private static void Blank(StreamWriter writer)
+        {
+            writer.WriteLine();
+            writer.WriteLine();
+            writer.WriteLine();
         }
     }
 }

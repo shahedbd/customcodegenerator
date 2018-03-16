@@ -36,11 +36,11 @@ namespace CodeGenerator
                 writer.WriteLine("    public interface I" + tableName + "BL");
                 writer.WriteLine("    {");
 
-                writer.WriteLine("Task<string> Insert" + tableName + "(" + tableName + " entity);");
-                writer.WriteLine("Task<string> Update" + tableName + "(" + tableName + " entity);");
-                writer.WriteLine("Task<string> Delete" + tableName + "(" + tableName + " entity);");
-                writer.WriteLine("Task<IEnumerable<" + tableName + ">> GetAll" + tableName + "();");
-                writer.WriteLine("Task<" + tableName + "> Get" + tableName + "By" + tablePk.ColumnName + "(" + tablePk.DataTypeName + " " + tablePk.ColumnName + ")");
+                writer.WriteLine("        Task<string> Insert" + tableName + "(" + tableName + " entity);");
+                writer.WriteLine("        Task<string> Update" + tableName + "(" + tableName + " entity);");
+                writer.WriteLine("        Task<string> Delete" + tableName + "(" + tableName + " entity);");
+                writer.WriteLine("        Task<IEnumerable<" + tableName + ">> GetAll" + tableName + "();");
+                writer.WriteLine("        Task<" + tableName + "> Get" + tableName + "By" + tablePk.ColumnName + "(" + tablePk.DataTypeName + " " + tablePk.ColumnName + ");");
 
                 writer.WriteLine("    }");
                 writer.WriteLine("}");

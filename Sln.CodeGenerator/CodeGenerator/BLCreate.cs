@@ -44,10 +44,6 @@ namespace CodeGenerator
 
             writer.WriteLine("namespace FXTF.CRM.Service.Admin.Implementations");
             writer.WriteLine("{");
-
-            writer.WriteLine();
-            writer.WriteLine();
-
             writer.WriteLine("public class " + tableName + "BL : I" + tableName + "BL");
             writer.WriteLine("{");
 
@@ -71,11 +67,7 @@ namespace CodeGenerator
             writer.WriteLine();
             writer.WriteLine();
 
-            writer.WriteLine("}");
-
-            writer.WriteLine();
-            writer.WriteLine();
-
+            writer.WriteLine("    }");
             writer.WriteLine("}");
         }
 
@@ -95,11 +87,11 @@ namespace CodeGenerator
             writer.WriteLine("/// </summary>");
             writer.WriteLine("/// <param name=\"entity\"></param>");
             writer.WriteLine("/// <returns>Message</returns>");
-            writer.WriteLine("public async Task<string> Insert" + "(" + tableName + " entity)");
+            writer.WriteLine("public async Task<string> Insert" + tableName + "(" + tableName + " entity)");
             writer.WriteLine("{");
             writer.WriteLine("try");
             writer.WriteLine("{");
-            writer.WriteLine("var result = await new " + tableName + "Repository(logger).Insert(entity);");
+            writer.WriteLine("var result = await new " + tableName + "Repository(Logger).Insert(entity);");
             writer.WriteLine("return result;");
             writer.WriteLine("}");
             writer.WriteLine("catch (Exception ex)");
@@ -118,12 +110,12 @@ namespace CodeGenerator
             writer.WriteLine("/// </summary>");
             writer.WriteLine("/// <param name=\"entity\"></param>");
             writer.WriteLine("/// <returns>Message</returns>");
-            writer.WriteLine("public async Task<string> Update" + "(" + tableName + " entity)");
+            writer.WriteLine("public async Task<string> Update" + tableName + "(" + tableName + " entity)");
             writer.WriteLine("{");
             writer.WriteLine("try");
             writer.WriteLine("{");
 
-            writer.WriteLine("var result = await new HoliDayRepository(logger).Update(entity);");
+            writer.WriteLine("var result = await new " + tableName + "Repository(Logger).Update(entity);");
             writer.WriteLine("return result;");
             writer.WriteLine("}");
             writer.WriteLine("catch (Exception ex)");
@@ -142,11 +134,11 @@ namespace CodeGenerator
             writer.WriteLine("/// </summary>");
             writer.WriteLine("/// <param name=\"" + tablePk.ColumnName + "\"></param>");
             writer.WriteLine("/// <returns>Message</returns>");
-            writer.WriteLine("public async Task<string> Delete(" + tablePk.DataTypeName + " " + tablePk.ColumnName + ")");
+            writer.WriteLine("public async Task<string> Delete" + tableName + "(" + tableName + " entity)");
             writer.WriteLine("{");
             writer.WriteLine("try");
             writer.WriteLine("{");
-            writer.WriteLine("var result = await new " + tableName + "Repository(logger).Delete(" + tablePk.ColumnName + ");");
+            writer.WriteLine("var result = await new " + tableName + "Repository(Logger).Delete(entity." + tablePk.ColumnName + ");");
             writer.WriteLine("return result;");
             writer.WriteLine("}");
             writer.WriteLine("catch (Exception ex)");
@@ -163,11 +155,11 @@ namespace CodeGenerator
             writer.WriteLine("/// Get All " + tableName);
             writer.WriteLine("/// </summary>");
             writer.WriteLine("/// <returns>List of" + tableName + "</returns>");
-            writer.WriteLine("public async Task<IEnumerable<" + tableName + ">> GetAll()");
+            writer.WriteLine("public async Task<IEnumerable<" + tableName + ">> GetAll" + tableName + "()");
             writer.WriteLine("{");
             writer.WriteLine("try");
             writer.WriteLine("{");
-            writer.WriteLine("var result = await new " + tableName + "Repository(logger).GetAll();");
+            writer.WriteLine("var result = await new " + tableName + "Repository(Logger).GetAll();");
             writer.WriteLine("return result;");
             writer.WriteLine("}");
             writer.WriteLine("catch (Exception ex)");
@@ -189,7 +181,7 @@ namespace CodeGenerator
             writer.WriteLine("{");
             writer.WriteLine("try");
             writer.WriteLine("{");
-            writer.WriteLine("var result = await new " + tableName + "Repository(logger).Get" + tableName + "By" + tablePk.ColumnName + "(" + tablePk.ColumnName + ");");
+            writer.WriteLine("var result = await new " + tableName + "Repository(Logger).GetByID(" + tablePk.ColumnName + ");");
             writer.WriteLine("return result;");
             writer.WriteLine("}");
             writer.WriteLine("catch (Exception ex)");

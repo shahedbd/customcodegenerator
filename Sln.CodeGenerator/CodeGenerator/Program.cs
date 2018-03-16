@@ -104,7 +104,7 @@ namespace CodeGenerator
                 case "int":
                     return "int";
                 case "tinyint":
-                    return "tinyint";
+                    return "int";
                 case "decimal":
                     return "decimal";
             }

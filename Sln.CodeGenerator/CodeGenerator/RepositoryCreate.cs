@@ -59,10 +59,6 @@ namespace CodeGenerator
 
             writer.WriteLine("namespace FXTF.CRM.Data.Repositories.Implementations");
             writer.WriteLine("{");
-
-            writer.WriteLine();
-            writer.WriteLine();
-
             writer.WriteLine("public class " + _tableName + "Repository : DBOperations<" + _tableName + ">, IRepository<" + _tableName + ">");
             writer.WriteLine("{");
 
@@ -88,11 +84,7 @@ namespace CodeGenerator
             writer.WriteLine();
             writer.WriteLine();
 
-            writer.WriteLine("}");
-
-            writer.WriteLine();
-            writer.WriteLine();
-
+            writer.WriteLine("   }");
             writer.WriteLine("}");
         }
 
@@ -198,10 +190,12 @@ namespace CodeGenerator
             writer.WriteLine();
 
             writer.WriteLine("var result = await ExecuteNonQueryProc(cmd);");
-            writer.WriteLine("if (Convert.ToString(result).Trim().Contains(\"Data Deleted Successfully\"))");
-            writer.WriteLine("{");
-            writer.WriteLine("new LiveLogHistoryRepository(logger).Insert(" + _tablePk.ColumnName + ".ToString() + \" has been Deleted.\", 1, 3);");
-            writer.WriteLine("}");
+
+            //writer.WriteLine("if (Convert.ToString(result).Trim().Contains(\"Data Deleted Successfully\"))");
+            //writer.WriteLine("{");
+            //writer.WriteLine("new LiveLogHistoryRepository(logger).Insert(" + _tablePk.ColumnName + ".ToString() + \" has been Deleted.\", 1, 3);");
+            //writer.WriteLine("}");
+
             writer.WriteLine("return result;");
             writer.WriteLine("}");
             writer.WriteLine("catch (Exception ex)");
@@ -242,14 +236,14 @@ namespace CodeGenerator
             writer.WriteLine("/// </summary>");
             writer.WriteLine("/// <param name=\"" + _tablePk.ColumnName + "\"></param>");
             writer.WriteLine("/// <returns>" + _tableName + " Object</returns>");
-            writer.WriteLine("public async Task<" + _tableName + "> Get" + _tableName + "By" + _tablePk.ColumnName + "(" + _tablePk.DataTypeName + " " + _tablePk.ColumnName + ")");
+            writer.WriteLine("public async Task<" + _tableName + "> GetByID(" + _tablePk.DataTypeName + " " + _tablePk.ColumnName + ")");
             writer.WriteLine("{");
             writer.WriteLine("try");
             writer.WriteLine("{");
             writer.WriteLine("var cmd = new SqlCommand(\"sp_" + _tableName + "\");");
             writer.WriteLine("cmd.Parameters.AddWithValue(\"@" + _tablePk.ColumnName + "\", " + _tablePk.ColumnName + ");");
             writer.WriteLine("cmd.Parameters.AddWithValue(\"@pOptions\", " + (int)RepositoryType.SelectById + ");");
-            writer.WriteLine("var result = await GetDataReaderProc(cmd);");
+            writer.WriteLine("var result = await GetByDataReaderProc(cmd);");
             writer.WriteLine("return result;");
             writer.WriteLine("}");
             writer.WriteLine("catch (Exception ex)");
@@ -285,55 +279,62 @@ namespace CodeGenerator
             writer.WriteLine("}");
             writer.WriteLine("}");
         }
+
         private string GetRipoItem(TableSchema schema)
         {
             switch (schema.DataTypeName)
             {
                 case "string":
                     {
-                        return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? reader[\"" + schema.ColumnName + "\"].ToString() : \"\";";
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? sqldatareader[\"" + schema.ColumnName + "\"].ToString() : \"\";";
                     }
                 case "long":
                     {
-                        return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? ((reader[\"" + schema.ColumnName +
-                               "\"] == DBNull.Value) ? 0 : Convert.ToInt64(reader[\"" + schema.ColumnName + "\"])) : 0 ;";
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? ((sqldatareader[\"" + schema.ColumnName +
+                               "\"] == DBNull.Value) ? 0 : Convert.ToInt64(sqldatareader[\"" + schema.ColumnName + "\"])) : 0 ;";
                     }
                 case "int":
                     {
-                        return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? ((reader[\"" + schema.ColumnName +
-                               "\"] == DBNull.Value) ? 0 : Convert.ToInt32(reader[\"" + schema.ColumnName + "\"])) : 0 ;";
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? ((sqldatareader[\"" + schema.ColumnName +
+                               "\"] == DBNull.Value) ? 0 : Convert.ToInt32(sqldatareader[\"" + schema.ColumnName + "\"])) : 0 ;";
                     }
                 case "tinyint":
                     {
-                        return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? ((reader[\"" + schema.ColumnName +
-                               "\"] == DBNull.Value) ? 0 : Convert.ToInt16(reader[\"" + schema.ColumnName + "\"])) : 0 ;";
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? ((sqldatareader[\"" + schema.ColumnName +
+                               "\"] == DBNull.Value) ? 0 : Convert.ToInt16(sqldatareader[\"" + schema.ColumnName + "\"])) : 0 ;";
                     }
+                case "byte":
+                    {
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? ((sqldatareader[\"" + schema.ColumnName +
+                               "\"] == DBNull.Value) ? 0 : Convert.ToInt16(sqldatareader[\"" + schema.ColumnName + "\"])) : 0 ;";
+                    }
+
                 case "DateTime":
                     {
-                        return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? ((reader[\"" + schema.ColumnName +
-                                "\"] == DBNull.Value) ? Convert.ToDateTime(\"01/01/1900\") : Convert.ToDateTime(reader[\"" +
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? ((sqldatareader[\"" + schema.ColumnName +
+                                "\"] == DBNull.Value) ? Convert.ToDateTime(\"01/01/1900\") : Convert.ToDateTime(sqldatareader[\"" +
                                 schema.ColumnName + "\"])) : Convert.ToDateTime(\"01/01/1900\");";
                     }
                 case "double":
                     {
-                        return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? ((reader[\"" + schema.ColumnName +
-                                "\"] == DBNull.Value) ? 0 : Convert.ToDouble(reader[\"" + schema.ColumnName + "\"])) : 0;";
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? ((sqldatareader[\"" + schema.ColumnName +
+                                "\"] == DBNull.Value) ? 0 : Convert.ToDouble(sqldatareader[\"" + schema.ColumnName + "\"])) : 0;";
                     }
                 case "bool":
                     {
-                        return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? ((reader[\"" + schema.ColumnName +
-                                "\"] == DBNull.Value) ? false : Convert.ToBoolean(reader[\"" + schema.ColumnName +
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? ((sqldatareader[\"" + schema.ColumnName +
+                                "\"] == DBNull.Value) ? false : Convert.ToBoolean(sqldatareader[\"" + schema.ColumnName +
                                 "\"])) : false;";
                     }
                 case "decimal":
                     {
-                        return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? ((reader[\"" + schema.ColumnName +
-                                 "\"] == DBNull.Value) ? 0 : Convert.ToDecimal(reader[\"" + schema.ColumnName + "\"])) : 0;";
+                        return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? ((sqldatareader[\"" + schema.ColumnName +
+                                 "\"] == DBNull.Value) ? 0 : Convert.ToDecimal(sqldatareader[\"" + schema.ColumnName + "\"])) : 0;";
                     }
             }
             if ("ntext".Equals(schema.DbTypeName))
             {
-                return "ColumnExists(reader, \"" + schema.ColumnName + "\") ? reader[\"" + schema.ColumnName + "\"].ToString() : \"\";";
+                return "Helper.ColumnExists(sqldatareader, \"" + schema.ColumnName + "\") ? sqldatareader[\"" + schema.ColumnName + "\"].ToString() : \"\";";
             }
             return "";
 
