@@ -27,9 +27,9 @@ namespace CodeGenerator
             var firstOrDefault = tableSchema.FirstOrDefault(p => p.IsIdentity.ToLower() == "true");
             if (firstOrDefault != null)
                 _tablePk = firstOrDefault;
-            if (tableName == "LiveCustomerPersonalInfo" || tableName == "LiveCustomerFinancialInfo")
-                _tablePk = tableSchema.ElementAt<TableSchema>(0);
+
             _tableName = tableName;
+
             strOutPutPath = path + tableName;
             if (!Directory.Exists(strOutPutPath))  // if it doesn't exist, create
                 Directory.CreateDirectory(strOutPutPath);

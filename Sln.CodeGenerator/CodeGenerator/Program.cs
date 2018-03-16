@@ -88,6 +88,15 @@ namespace CodeGenerator
                     return "long";
                 case "nvarchar":
                     return "string";
+                case "nchar":
+                    return "string";
+                case "varchar":
+                    return "string";
+                case "varbinary":
+                    return "string";
+
+
+
                 case "datetime":
                     return "DateTime";
                 case "bit":
@@ -101,5 +110,6 @@ namespace CodeGenerator
             }
             return "";
         }
+
     }
 }
