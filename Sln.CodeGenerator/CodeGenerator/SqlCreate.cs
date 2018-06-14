@@ -68,7 +68,10 @@ namespace CodeGenerator
 
             foreach (var schema in tableSchema)
             {
-                writer.WriteLine("@" + schema.ColumnName + "		" + schema.DbTypeName + (schema.DbTypeName == "nchar" ? "(" + schema.ColumnSize.ToString() + ")" : "") + " = null,");
+                writer.WriteLine("@" + schema.ColumnName + "		" + schema.DbTypeName + 
+                    (schema.DbTypeName == "nchar" || schema.DbTypeName == "nvarchar" ? "(" + schema.ColumnSize.ToString() + ")" 
+                    : "") + " = null,");
+
                 var abc = "@" + schema.ColumnName + "		" + schema.DbTypeName + (schema.DbTypeName == "nchar" ? "(" + schema.ColumnSize.ToString() + ")" : "") + " = null,";
             }
 
@@ -90,10 +93,13 @@ namespace CodeGenerator
             writer.WriteLine("(");
 
             var stringBuilder = new StringBuilder();
+            bool firstINSERTINTO = true;
 
             foreach (var schema in tableSchema)
             {
-                stringBuilder.Append(schema.ColumnName + ",");
+                if (!firstINSERTINTO)
+                    stringBuilder.Append(schema.ColumnName + ",");
+                firstINSERTINTO = false;
             }
 
             writer.WriteLine(stringBuilder.RemoveLast(","));
@@ -103,9 +109,12 @@ namespace CodeGenerator
 
 
             stringBuilder = new StringBuilder();
+            bool firstVALUES = true;
             foreach (var schema in tableSchema)
-            {
-                stringBuilder.Append("@" + schema.ColumnName + ",");
+            {               
+                if (!firstVALUES)
+                    stringBuilder.Append("@" + schema.ColumnName + ",");
+                firstVALUES = false;
             }
             writer.WriteLine(stringBuilder.RemoveLast(","));
 
@@ -139,7 +148,7 @@ namespace CodeGenerator
                 stringBuilder.AppendLine("" + schema.ColumnName + "	=	@" + schema.ColumnName + " ,");
             }
             writer.WriteLine(stringBuilder.RemoveLast(","));
-        
+
             writer.WriteLine("WHERE	" + tablePk.ColumnName + "	=	@" + tablePk.ColumnName + ";");
 
             writer.WriteLine("IF @@ROWCOUNT = 0");
@@ -164,7 +173,7 @@ namespace CodeGenerator
             writer.WriteLine("end");
             writer.WriteLine("--End of Delete " + tableName + " ");
         }
-      
+
         private void WriteGetAll(StreamWriter writer)
         {
             writer.WriteLine("--Select All " + tableName + " ");
@@ -182,7 +191,7 @@ namespace CodeGenerator
             writer.WriteLine("--Select " + tableName + " By " + tablePk.ColumnName + " ");
             writer.WriteLine("if(@pOptions=" + (int)SqlType.SelectById + ")");
             writer.WriteLine("begin");
-            writer.WriteLine("select * from " + tableName + " Where " + tablePk.ColumnName + "=@" + tablePk.ColumnName + ";");          
+            writer.WriteLine("select * from " + tableName + " Where " + tablePk.ColumnName + "=@" + tablePk.ColumnName + ";");
             writer.WriteLine("if(@@ROWCOUNT=0)");
             writer.WriteLine("SET @Msg='Data Not Found';");
             writer.WriteLine("end");
